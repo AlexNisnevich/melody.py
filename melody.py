@@ -9,7 +9,7 @@ from pyknon.genmidi import Midi
 from pyknon.music import Note, NoteSeq
 
 
-# melody.py generates pleasant melodies according to the rules for cantus firmus
+# melody.py generates simple counterpoint melodies (cantus firmus + first species)
 # Requirements:
 #	- pyknon (library used to generate midi tracks) - http://kroger.github.com/pyknon/
 #	- timidity (utility for playing midi tracks) - http://timidity.sourceforge.net/
@@ -28,7 +28,9 @@ def remove_dupes(seq):
 
 # Constants for convenience
 
-P1 = C  = I   = Tonic       = 0
+KEY_NAMES = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B']
+
+P1 = C  = I   = Tonic = Unison = 0
 m2 = Db = ii                = 1
 M2 = D  = II  = Step        = 2
 m3 = Eb = iii               = 3
@@ -203,7 +205,19 @@ def check_melody(m, verbose = False):
 
 	return no_note_repeated_too_often() and leading_note_goes_to_tonic() and no_same_two_intervals_in_a_row() and no_repetition() and larger_leaps_followed_by_change_of_direction() and no_dissonant_leaps() and no_leaps_larger_than_octave() and no_noodling() and between_two_and_four_leaps() and has_climax() and final_note_approached_by_step() and no_more_than_two_consecutive_leaps_in_same_direction() and changes_direction_several_times() and no_long_runs() and no_unresolved_melodic_tension() and no_sequences()
 
-def pick_melody(length):
+def check_first_species(cantus, first_species, verbose = False):
+	vertical_intervals = [abs(cantus[i] - first_species[i]) for i in range(len(cantus))]
+
+	def no_dissonant_intervals():
+		consonant = [Unison, m3, M3, P4, P5, m6, M6]
+		return not any([(x % Octave) not in consonant for x in vertical_intervals])
+
+	def no_intervals_larger_than_12th():
+		return not any([x > (P8 + P5) for x in vertical_intervals])
+
+	return no_dissonant_intervals() and no_intervals_larger_than_12th()
+
+def pick_melody(length, start_note = I, cantus = None): # pass cantus if this is a species melody
 	registers = {
 		'major': [IV-O, V-O, VI-O, VII-O, I, II, III, IV, V, VI, VII, I+O, II+O, III+O, IV+O],
 		'minor': [IV-O, V-O, vi-O, vii-O, I, II, iii, IV, V, vi, vii, I+O, II+O, iii+O, IV+O]
@@ -213,50 +227,93 @@ def pick_melody(length):
 	tonality = 'major' # avoiding minor for now
 	register = registers[tonality]
 
-	melody = [I]
+	melody = [start_note]
 	for i in range(length - 2):
-		note = choice([x for x in register if abs(x - melody[-1]) in allowed_intervals])
+		if cantus:
+			consonant_intervals = [m3, M3, P4, P5, m6, M6]
+
+			# do some optimizing now to pass the first species tests for middle notes
+			note = choice([x for x in register if abs(x - melody[-1]) in allowed_intervals
+											  and abs(x - cantus[i+1]) % Octave in consonant_intervals
+											  and abs(x - cantus[i+1]) < (P8 + P5)
+						  ])
+		else:
+			note = choice([x for x in register if abs(x - melody[-1]) in allowed_intervals])
 		melody.append(note)
 	melody.append(choice([I, I + Octave]))
 
 	return melody, tonality
 
-def random_transpose(melody):
+def random_transpose(melodies):
 	key = choice([C, D, Eb, F, G, A-O, Bb-O])
-	return [x + key for x in melody]
+	return [[x + key for x in melody] for melody in melodies]
 
-def display_melody(melody, raw_melody, tonality, time_elapsed, tries):
-	key_names = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B']
+def display_melody(melodies, raw_melodies, tonality, time_elapsed, tries):
+	def pack_melody(melody, key):
+		return str(sum([(x + 12) * pow(24, i) for i, x in enumerate(melody + [key])]))
 
-	key = melody[0] % Octave
-	packed_melody = sum([(x + 12) * pow(24, i) for i, x in enumerate(raw_melody + [key])])
+	key = melodies[0][0] % Octave
+	packed_melodies = '-'.join([pack_melody(m, key) for m in raw_melodies])
 
 	print
-	print '=== Melody #' + str(packed_melody) + ' ==='
-	print 'Key of ' + key_names[key] + ' ' + tonality.capitalize()
-	print ' '.join([key_names[x%Octave] + str(4 + (x+3)//Octave) for x in melody]) + ' - ' + str(raw_melody)
-	print 'Runs: ' + str(get_runs_from_melody(raw_melody))
+	print '=== Melody #' + packed_melodies + ' ==='
+	print 'Key of ' + KEY_NAMES[key] + ' ' + tonality.capitalize()
+
+	# display each melody in a separate line
+	for i in range(len(melodies)):
+		print ' '.join([KEY_NAMES[x%Octave] + str(4 + (x+3)//Octave) for x in melodies[i]]) + ' - ' + str(raw_melodies[i])
+
+	# display information about the melody
+	vertical_intervals = [abs(cantus[i] - first_species[i]) for i in range(len(cantus))]
+	print 'Vertical Intervals: ' + str(vertical_intervals)
+	# print 'Runs: ' + str(get_runs_from_melody(raw_melodies[0]))
+
+	# display timing information
 	print str(time_elapsed) + ' secs taken (' + "{:,d}".format(tries) + ' melodies tried)'
 	print
+
+def midi_from_melodies(melodies):
+	notes = [[Note(x%Octave, 4 + x//Octave, 1/4) for x in melody] for melody in melodies]
+	chords = [NoteSeq([melody_notes[i] for melody_notes in notes]) for i in range(len(melody))]
+
+	midi = Midi(tempo=120)
+	midi.seq_chords(chords)
+	return midi
 
 random_seed = random()
 print 'Seed: %.16f' % random_seed
 seed(random_seed)
 
 while True:
+	melodies = []
+
+	# start timing
 	start_time = clock()
 	tries = 0
+
+	# generate cantus firmus (base melody)
 	while True:
 		tries += 1
-		melody, tonality = pick_melody(10)
-		if check_melody(melody):
+		cantus, tonality = pick_melody(10, Tonic)
+		if check_melody(cantus):
 			break
+	melodies.append(cantus)
+
+	# generate first species above cantus firmus
+	while True:
+		tries += 1
+		first_species, tonality = pick_melody(10, choice([P5, Octave]), cantus)
+		if check_melody(first_species) and check_first_species(cantus, first_species):
+			break
+	melodies.append(first_species)
+
+	# finish timing
 	time_elapsed = clock() - start_time
 
-	transposed_melody = random_transpose(melody)
+	# transpose to random valid key
+	transposed_melodies = random_transpose(melodies)
 
-	display_melody(transposed_melody, melody, tonality, time_elapsed, tries)
-
-	midi = Midi(tempo=120)
-	midi.seq_notes(NoteSeq([Note(x%Octave, 4 + x//Octave, 1/4) for x in transposed_melody])) # for random durations try (random()/4 + 1/16)
+	# display notes and generate midi
+	display_melody(transposed_melodies, melodies, tonality, time_elapsed, tries)
+	midi = midi_from_melodies(transposed_melodies)
 	play_midi(midi)
