@@ -89,7 +89,8 @@ def check_melody(m, verbose = False):
 			if verbose: print 'fail: no_repetition in ' + str(m)
 
 	def no_leaps_larger_than_octave():
-		if not any([abs(x) > P8 for x in leaps]):
+		# let's disallow octaves as well, because they rarely sound good
+		if not any([abs(x) >= P8 for x in leaps]):
 			return True
 		else:
 			if verbose: print 'fail: no_leaps_larger_than_octave in ' + str(m)
@@ -175,7 +176,7 @@ def check_melody(m, verbose = False):
 		runs = get_runs_from_melody(m)
 		for run in runs:
 			if len(run) > 4:
-				print 'fail: no_long_runs in ' + str(m) + ' : ' + str(runs)
+				if verbose: print 'fail: no_long_runs in ' + str(m) + ' : ' + str(runs)
 				return False
 		return True
 
@@ -186,7 +187,7 @@ def check_melody(m, verbose = False):
 		for run in runs:
 			movement = abs(run[0] - run[-1])
 			if movement not in consonant_movements:
-				print 'fail: no_unresolved_melodic_tension in ' + str(m) + ' : ' + str(runs)
+				if verbose: print 'fail: no_unresolved_melodic_tension in ' + str(m) + ' : ' + str(runs)
 				return False
 		return True
 
@@ -197,7 +198,7 @@ def check_melody(m, verbose = False):
 		if len(normalized_triples) == len(set(normalized_triples)): # no duplicates
 			return True
 		else:
-			print 'fail: no_sequences in ' + str(m) + ' : ' + str(normalized_triples)
+			if verbose: print 'fail: no_sequences in ' + str(m) + ' : ' + str(normalized_triples)
 			return False
 
 	return no_note_repeated_too_often() and leading_note_goes_to_tonic() and no_same_two_intervals_in_a_row() and no_repetition() and larger_leaps_followed_by_change_of_direction() and no_dissonant_leaps() and no_leaps_larger_than_octave() and no_noodling() and between_two_and_four_leaps() and has_climax() and final_note_approached_by_step() and no_more_than_two_consecutive_leaps_in_same_direction() and changes_direction_several_times() and no_long_runs() and no_unresolved_melodic_tension() and no_sequences()
