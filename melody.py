@@ -78,17 +78,23 @@ def get_runs_from_melody(melody):
 
 	return runs
 
-def check_melody(m, verbose = False):
+def check_melody(m, type, verbose = False):
 	intervals = [m[i+1] - m[i] for i in range(len(m) - 1)]
 	directions = [sign(intervals[i]) for i in range(len(intervals))]
 	leaps = [x for x in intervals if abs(x) > Step]
 	notes = [x % Octave for x in m]
 
 	def no_repetition():
-		if 0 not in intervals:
-			return True
-		else:
-			if verbose: print 'fail: no_repetition in ' + str(m)
+		if type == 'cantus': # no repetition allowed in cantus firmus
+			if 0 not in intervals:
+				return True
+			else:
+				if verbose: print 'fail: no_repetition in cantus firmus: ' + str(m)
+		elif type == 'first_species': # one repetition allowed in first species
+			if intervals.count(0) <= 1:
+				return True
+			else:
+				if verbose: print 'fail: no_repetition in first species: ' + str(m)
 
 	def no_leaps_larger_than_octave():
 		# let's disallow octaves as well, because they rarely sound good
@@ -207,6 +213,7 @@ def check_melody(m, verbose = False):
 
 def check_first_species(cantus, first_species, verbose = False):
 	vertical_intervals = [abs(cantus[i] - first_species[i]) for i in range(len(cantus))]
+	v_i = vertical_intervals
 
 	def no_dissonant_intervals():
 		consonant = [Unison, m3, M3, P4, P5, m6, M6]
@@ -215,7 +222,21 @@ def check_first_species(cantus, first_species, verbose = False):
 	def no_intervals_larger_than_12th():
 		return not any([x > (P8 + P5) for x in vertical_intervals])
 
-	return no_dissonant_intervals() and no_intervals_larger_than_12th()
+	def no_parallel_fifths_or_octaves():
+		for i in range(len(cantus) - 1):
+			if (v_i[i] == P5 and v_i[i+1] == P5) or (v_i[i] == P8 and v_i[i+1] == P8):
+				print 'fail: no_parallel_fifths_or_octaves in vertical intervals: ' + str(vertical_intervals)
+				return False
+		return True
+
+	def no_parallel_chains():
+		for i in range(len(cantus) - 1):
+			if v_i[i] == v_i[i+1] and v_i[i+1] == v_i[i+2] and v_i[i+2] == v_i[i+3]:
+				print 'fail: no_parallel_chains in vertical intervals: ' + str(vertical_intervals)
+				return False
+		return True
+
+	return no_parallel_fifths_or_octaves() and no_parallel_chains() and no_dissonant_intervals() and no_intervals_larger_than_12th()
 
 def pick_melody(length, start_note = I, cantus = None): # pass cantus if this is a species melody
 	registers = {
@@ -230,13 +251,20 @@ def pick_melody(length, start_note = I, cantus = None): # pass cantus if this is
 	melody = [start_note]
 	for i in range(length - 2):
 		if cantus:
-			consonant_intervals = [m3, M3, P4, P5, m6, M6]
+			allowed_intervals = [Unison, m2, M2, M3, P4, P5, m6, P8] # one repetition allowed for first species
+			allowed_vertical_intervals = [m3, M3, P4, P5, m6, M6]
 
 			# do some optimizing now to pass the first species tests for middle notes
-			note = choice([x for x in register if abs(x - melody[-1]) in allowed_intervals
-											  and abs(x - cantus[i+1]) % Octave in consonant_intervals
-											  and abs(x - cantus[i+1]) < (P8 + P5)
-						  ])
+			available_notes = [x for x in register if abs(x - melody[-1]) in allowed_intervals
+					and x > cantus[i+1] 											# no cross-over
+					and abs(x - cantus[i+1]) % Octave in allowed_vertical_intervals # consonant vertical interval
+					and abs(x - cantus[i+1]) < (P8 + P5) 							# no vertical interval larger than 12th
+			]
+
+			if len(available_notes) > 0:
+				note = choice(available_notes)
+			else:
+				return False, 'none'
 		else:
 			note = choice([x for x in register if abs(x - melody[-1]) in allowed_intervals])
 		melody.append(note)
@@ -286,6 +314,7 @@ seed(random_seed)
 
 while True:
 	melodies = []
+	try_again = False
 
 	# start timing
 	start_time = clock()
@@ -295,16 +324,25 @@ while True:
 	while True:
 		tries += 1
 		cantus, tonality = pick_melody(10, Tonic)
-		if check_melody(cantus):
+		if cantus and check_melody(cantus, 'cantus'):
 			break
 	melodies.append(cantus)
 
 	# generate first species above cantus firmus
 	while True:
 		tries += 1
-		first_species, tonality = pick_melody(10, choice([P5, Octave]), cantus)
-		if check_melody(first_species) and check_first_species(cantus, first_species):
+		if tries >= 200000:
+			try_again = True
 			break
+
+		first_species, tonality = pick_melody(10, choice([P5, Octave]), cantus)
+		if first_species and check_melody(first_species, 'first_species') and check_first_species(cantus, first_species):
+			break
+	if try_again:
+		print 'No matching first species found for this cantus firmus: ' + str(cantus)
+		print str(clock() - start_time) + ' secs taken (' + "{:,d}".format(tries) + ' melodies tried)'
+		print
+		continue
 	melodies.append(first_species)
 
 	# finish timing
