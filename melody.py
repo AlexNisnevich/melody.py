@@ -225,14 +225,14 @@ def check_first_species(cantus, first_species, verbose = False):
 	def no_parallel_fifths_or_octaves():
 		for i in range(len(cantus) - 1):
 			if (v_i[i] == P5 and v_i[i+1] == P5) or (v_i[i] == P8 and v_i[i+1] == P8):
-				print 'fail: no_parallel_fifths_or_octaves in vertical intervals: ' + str(vertical_intervals)
+				if verbose: print 'fail: no_parallel_fifths_or_octaves in vertical intervals: ' + str(vertical_intervals)
 				return False
 		return True
 
 	def no_parallel_chains():
 		for i in range(len(cantus) - 1):
 			if v_i[i] == v_i[i+1] and v_i[i+1] == v_i[i+2] and v_i[i+2] == v_i[i+3]:
-				print 'fail: no_parallel_chains in vertical intervals: ' + str(vertical_intervals)
+				if verbose: print 'fail: no_parallel_chains in vertical intervals: ' + str(vertical_intervals)
 				return False
 		return True
 
@@ -330,6 +330,8 @@ while True:
 	melodies.append(cantus)
 
 	# generate first species above cantus firmus
+	attempts = set()
+	set_matches = 0
 	while True:
 		tries[1] += 1
 		if tries[1] >= 50000:
@@ -337,8 +339,20 @@ while True:
 			break
 
 		first_species, tonality = pick_melody(10, choice([P5, Octave]), cantus)
-		if first_species and check_melody(first_species, 'first_species') and check_first_species(cantus, first_species):
-			break
+
+		if first_species:
+			if tuple(first_species) not in attempts:
+				attempts.add(tuple(first_species))
+				if check_melody(first_species, 'first_species') and check_first_species(cantus, first_species):
+					break
+			else:
+				# if we see, say, 2000 repeated attempts, we're probably tried everything there is to try
+				set_matches += 1
+				if set_matches >= 2000:
+					try_again = True
+					break
+
+
 	if try_again:
 		print 'No matching first species found for this cantus firmus: ' + str(cantus)
 		print str(clock() - start_time) + ' secs taken (' + ' + '.join(["{:,d}".format(m) for m in tries]) + ' melodies tried)'
