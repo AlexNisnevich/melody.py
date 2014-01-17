@@ -3,47 +3,28 @@ melody.py
 
 **melody.py** generates random 10-note [first species counterpoint](http://en.wikipedia.org/wiki/Counterpoint#First_species) melodies by first finding a random *cantus firmus* melody that matches a set of heuristics and then finding an appropriate counterpoint melody. A total of [16 heuristics](https://github.com/AlexNisnevich/melody.py/blob/master/melody.py#L81-L212) are used for each individual melody and [4 heuristics](https://github.com/AlexNisnevich/melody.py/blob/master/melody.py#L214-L239) are used to match two melodies in counterpoint. Results are outputted as MIDI files using Pyknon and then played using Timidity.
 
-1\.  [Video Demonstration](#videodemonstration)  
-2\.  [Installation](#installation)  
-2.1\.  [Ubuntu / Debian](#ubuntu/debian)  
-2.2\.  [Other](#other)  
-3\.  [Heuristics Used](#heuristicsused)  
-3.1\.  [For each individual melody](#foreachindividualmelody)  
-3.2\.  [To match cantus firmus melody to first species melody](#tomatchcantusfirmusmelodytofirstspeciesmelody)  
-4\.  [Wish List](#wishlist)  
+!TOC
 
-<a name="videodemonstration"></a>
+### Video Demonstration
 
-### 1\. Video Demonstration
+!VIDEO "http://www.youtube.com/embed/8cF6pfrD4RM"
 
-[![Link to Youtube video](images/youtube/8cF6pfrD4RM.png)](http://www.youtube.com/watch?v=8cF6pfrD4RM)
+### Installation
 
-<a name="installation"></a>
-
-### 2\. Installation
-
-<a name="ubuntu/debian"></a>
-
-#### 2.1\. Ubuntu / Debian
+#### Ubuntu / Debian
 
 ```
 sudo apt-get install python-pip timidity
 pip install pyknon
 ```
 
-<a name="other"></a>
-
-#### 2.2\. Other
+#### Other
 
 Install [Pyknon](http://kroger.github.com/pyknon/) and [Timidity](http://timidity.sourceforge.net/).
 
-<a name="heuristicsused"></a>
+### Heuristics Used
 
-### 3\. Heuristics Used
-
-<a name="foreachindividualmelody"></a>
-
-#### 3.1\. For each individual melody
+#### For each individual melody
 
 Both the cantus firmus and the first species must satisfy the following rules:
 
@@ -64,9 +45,7 @@ Both the cantus firmus and the first species must satisfy the following rules:
 15. No unresolved melodic tension (that is, the start and end note of each run must be consonant together).
 16. No repeated three-note patterns.
 
-<a name="tomatchcantusfirmusmelodytofirstspeciesmelody"></a>
-
-#### 3.2\. To match cantus firmus melody to first species melody
+#### To match cantus firmus melody to first species melody
 
 Together, the cantus firmus and the first species must satisfy the following:
 
@@ -75,9 +54,7 @@ Together, the cantus firmus and the first species must satisfy the following:
 3. No parallel fifths or octaves.
 4. No parallel three-note chains.
 
-<a name="wishlist"></a>
-
-### 4\. Wish List
+### Wish List
 
 - support for other kinds of counterpoint
 - support for melodies of other lengths (with rules tuned appropriately)
