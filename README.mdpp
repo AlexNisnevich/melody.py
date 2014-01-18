@@ -19,33 +19,25 @@ I've spun up an [Amazon EC2 instance](http://ec2-54-184-67-209.us-west-2.compute
 
 You can use melody.py through the command-line or by running a small web server. The advantage of the latter is that you'll also be able to see generated sheet music.
 
-#### Installation - Ubuntu / Debian
+#### Installation
 
-##### Command-line interface
+##### Ubuntu / Debian
 
 ```
 sudo apt-get install python-pip timidity
 pip install pyknon
 ```
 
-##### Web interface
-
-Same as above, then
+If you wish to use the web interface, also run
 ```
 pip install flask
 ```
 
-Also, make sure [FFmpeg](http://www.ffmpeg.org/) is installed.
-
-#### Installation - Other
-
-##### Command-line interface
+##### Other
 
 Install [Pyknon](http://kroger.github.com/pyknon/) and [Timidity](http://timidity.sourceforge.net/).
 
-##### Web interface
-
-Also install [Flask](http://flask.pocoo.org/) and [FFmpeg](http://www.ffmpeg.org/).
+If you wish to use the web interface, also install [Flask](http://flask.pocoo.org/). If you're using Internet Explorer (which supports MP3 but not WAV audio sources), make sure [FFmpeg](http://www.ffmpeg.org/) is installed.
 
 #### Running melody.py
 

@@ -8,15 +8,12 @@ melody.py
 1\.  [Try It Now!](#tryitnow!)  
 2\.  [Video Demonstration](#videodemonstration)  
 3\.  [Usage](#usage)  
-3.1\.  [Installation - Ubuntu / Debian](#installation-ubuntu/debian)  
-3.1.1\.  [Command-line interface](#command-lineinterface)  
-3.1.2\.  [Web interface](#webinterface)  
-3.2\.  [Installation - Other](#installation-other)  
-3.2.1\.  [Command-line interface](#command-lineinterface-1)  
-3.2.2\.  [Web interface](#webinterface-1)  
-3.3\.  [Running melody.py](#runningmelody.py)  
-3.3.1\.  [Command-line interface](#command-lineinterface-2)  
-3.3.2\.  [Web interface](#webinterface-2)  
+3.1\.  [Installation](#installation)  
+3.1.1\.  [Ubuntu / Debian](#ubuntu/debian)  
+3.1.2\.  [Other](#other)  
+3.2\.  [Running melody.py](#runningmelody.py)  
+3.2.1\.  [Command-line interface](#command-lineinterface)  
+3.2.2\.  [Web interface](#webinterface)  
 4\.  [Heuristics Used](#heuristicsused)  
 4.1\.  [For each individual melody](#foreachindividualmelody)  
 4.2\.  [To match cantus firmus melody to first species melody](#tomatchcantusfirmusmelodytofirstspeciesmelody)  
@@ -40,61 +37,47 @@ I've spun up an [Amazon EC2 instance](http://ec2-54-184-67-209.us-west-2.compute
 
 You can use melody.py through the command-line or by running a small web server. The advantage of the latter is that you'll also be able to see generated sheet music.
 
-<a name="installation-ubuntu/debian"></a>
+<a name="installation"></a>
 
-#### 3.1\. Installation - Ubuntu / Debian
+#### 3.1\. Installation
 
-<a name="command-lineinterface"></a>
+<a name="ubuntu/debian"></a>
 
-##### 3.1.1\. Command-line interface
+##### 3.1.1\. Ubuntu / Debian
 
 ```
 sudo apt-get install python-pip timidity
 pip install pyknon
 ```
 
-<a name="webinterface"></a>
-
-##### 3.1.2\. Web interface
-
-Same as above, then
+If you wish to use the web interface, also run
 ```
 pip install flask
 ```
 
-Also, make sure [FFmpeg](http://www.ffmpeg.org/) is installed.
+<a name="other"></a>
 
-<a name="installation-other"></a>
-
-#### 3.2\. Installation - Other
-
-<a name="command-lineinterface-1"></a>
-
-##### 3.2.1\. Command-line interface
+##### 3.1.2\. Other
 
 Install [Pyknon](http://kroger.github.com/pyknon/) and [Timidity](http://timidity.sourceforge.net/).
 
-<a name="webinterface-1"></a>
-
-##### 3.2.2\. Web interface
-
-Also install [Flask](http://flask.pocoo.org/) and [FFmpeg](http://www.ffmpeg.org/).
+If you wish to use the web interface, also install [Flask](http://flask.pocoo.org/). If you're using Internet Explorer (which supports MP3 but not WAV audio sources), make sure [FFmpeg](http://www.ffmpeg.org/) is installed.
 
 <a name="runningmelody.py"></a>
 
-#### 3.3\. Running melody.py
+#### 3.2\. Running melody.py
 
-<a name="command-lineinterface-2"></a>
+<a name="command-lineinterface"></a>
 
-##### 3.3.1\. Command-line interface
+##### 3.2.1\. Command-line interface
 ```
 python melody.py
 ```
 will loop forever, generating new melodies continuously. Mash Ctrl-C a few times to stop it.
 
-<a name="webinterface-2"></a>
+<a name="webinterface"></a>
 
-##### 3.3.2\. Web interface
+##### 3.2.2\. Web interface
 ```
 python app.py
 ```
