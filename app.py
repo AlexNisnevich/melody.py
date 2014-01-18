@@ -8,9 +8,9 @@ class MyFlask(Flask):
             return 1
         return 60
 
-app = MyFlask(__name__)
+melodypy = MyFlask(__name__)
 
-@app.route("/")
+@melodypy.route("/")
 def hello():
 	total_time_elapsed = 0.0
 	success = False
@@ -30,5 +30,5 @@ def hello():
 	)
 
 if __name__ == "__main__":
-	app.debug = True
-	app.run()
+	melodypy.debug = True
+	melodypy.run()
