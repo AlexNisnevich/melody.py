@@ -7,22 +7,52 @@ melody.py
 
 !TOC
 
+### Try It Now!
+
+I've spun up an [Amazon EC2 instance](http://ec2-54-184-67-209.us-west-2.compute.amazonaws.com/).
+
 ### Video Demonstration
 
 !VIDEO "http://www.youtube.com/embed/8cF6pfrD4RM"
 
-### Installation
+### Usage
 
-#### Ubuntu / Debian
+You can use melody.py through the command-line or by running a small web server. The advantage of the latter is that you'll also be able to see generated sheet music.
+
+#### Installation
+
+##### Ubuntu / Debian
 
 ```
 sudo apt-get install python-pip timidity
 pip install pyknon
 ```
 
-#### Other
+If you wish to use the web interface, also run
+```
+pip install flask
+```
+
+##### Other
 
 Install [Pyknon](http://kroger.github.com/pyknon/) and [Timidity](http://timidity.sourceforge.net/).
+
+If you wish to use the web interface, also install [Flask](http://flask.pocoo.org/). If you're using Internet Explorer (which supports MP3 but not WAV audio sources), make sure [FFmpeg](http://www.ffmpeg.org/) is installed.
+
+#### Running melody.py
+
+##### Command-line interface
+```
+python melody.py
+```
+will loop forever, generating new melodies continuously. Mash Ctrl-C a few times to stop it.
+
+##### Web interface
+```
+python app.py
+```
+
+Then go to `localhost:5000` (or whatever port is chosen).
 
 ### Heuristics Used
 
@@ -58,7 +88,8 @@ Together, the cantus firmus and the first species must satisfy the following:
 
 ### Wish List
 
+- minor key support
 - support for other kinds of counterpoint
 - support for melodies of other lengths (with rules tuned appropriately)
-- web interface of some kind
-- treating repeated notes as a single note of double duration rather than two separate notes
+- ability to import existing cantus firmus (as MIDI or note array)
+- minor: treating repeated notes as a single note of double duration rather than two separate notes

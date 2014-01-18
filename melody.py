@@ -4,6 +4,7 @@ from random import choice, random, seed
 from time import sleep, clock
 import os
 import math
+import string
 
 from pyknon.genmidi import Midi
 from pyknon.music import Note, NoteSeq
@@ -45,13 +46,26 @@ M7 = Bb = VII = LeadingTone = 11
 P8      = O   = Octave      = 12
 
 def save_midi(midi):
-	midi.write("static/output.mid")
-	os.system("rm static/output.mp3")
-	os.system("timidity static/output.mid -Ow -o - | ffmpeg -i - -acodec libmp3lame -ab 64k static/output.mp3 >/dev/null 2>&1")
+	output_dir = os.path.dirname(os.path.abspath(__file__)) + "/static/output/"
+	mid_path = output_dir + "output.mid"
+	wav_name = ''.join(choice(string.ascii_uppercase + string.digits) for x in range(10))
+	wav_path = output_dir + wav_name + ".wav"
+	mp3_path = output_dir + wav_name + ".mp3"
+
+	try:
+		midi.write(mid_path)
+		os.system("timidity " + mid_path + " -Ow -o - >" + wav_path)
+		os.system("cat " + wav_path + " | ffmpeg -i - -acodec libmp3lame -ab 64k " + mp3_path + " >/dev/null 2>&1")
+	except Exception as e:
+		print e
+
+	return wav_name
 
 def play_midi(midi):
-	save_midi(midi)
-	os.system("timidity static/output.mid >/dev/null")
+	current_dir = os.path.dirname(os.path.abspath(__file__))
+	mid_path = current_dir + "/output.mid"
+	
+	os.system("timidity " + mid_path + " >/dev/null")
 
 def get_runs_from_melody(melody):
 	# e.g.
@@ -318,7 +332,7 @@ random_seed = random()
 print 'Seed: %.16f' % random_seed
 seed(random_seed)
 
-def generate_melody(play = True):
+def generate_melody(server = False):
 	melodies = []
 	try_again = False
 
@@ -359,9 +373,10 @@ def generate_melody(play = True):
 
 
 	if try_again:
-		print 'No matching first species found for this cantus firmus: ' + str(cantus)
-		print str(clock() - start_time) + ' secs taken (' + ' + '.join(["{:,d}".format(m) for m in tries]) + ' melodies tried)'
-		print
+		if not server:
+			print 'No matching first species found for this cantus firmus: ' + str(cantus)
+			print str(clock() - start_time) + ' secs taken (' + ' + '.join(["{:,d}".format(m) for m in tries]) + ' melodies tried)'
+			print
 		return False, None
 	melodies.append(first_species)
 
@@ -372,23 +387,25 @@ def generate_melody(play = True):
 	transposed_melodies = random_transpose(melodies)
 
 	# display notes and generate midi
-	display_melody(transposed_melodies, melodies, tonality, time_elapsed, tries, cantus, first_species)
 	midi = midi_from_melodies(transposed_melodies)
-	if play:
-		play_midi(midi)
+	filename = save_midi(midi)
+
+	if server:
+		# return pitches and key signature, to create sheet music
+		pitches = []
+		for i in range(len(transposed_melodies)):
+			pitches.append([KEY_NAMES[x%Octave].lower() + "/" + str(4 + x//Octave) for x in transposed_melodies[i]])
+		lower_voice = list(pitches[0])
+		upper_voice = list(pitches[1])
+
+		key = KEY_NAMES[transposed_melodies[0][0] % Octave]
+		key_signature = key if tonality == 'major' else key + "m"
+
+		return True, (filename, lower_voice, upper_voice, key_signature, time_elapsed, tries)
 	else:
-		save_midi(midi)
-
-	pitches = []
-	for i in range(len(transposed_melodies)):
-		pitches.append([KEY_NAMES[x%Octave].lower() + "/" + str(4 + x//Octave) for x in transposed_melodies[i]])
-	lower_voice = list(pitches[0])
-	upper_voice = list(pitches[1])
-
-	key = KEY_NAMES[transposed_melodies[0][0] % Octave]
-	key_signature = key if tonality == 'major' else key + "m"
-
-	return True, (lower_voice, upper_voice, key_signature, time_elapsed, tries)
+		# display melody in console and play the MIDI file
+		display_melody(transposed_melodies, melodies, tonality, time_elapsed, tries, cantus, first_species)
+		play_midi(midi)
 
 if __name__ == "__main__":
 	while True:

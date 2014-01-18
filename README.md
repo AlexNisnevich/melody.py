@@ -5,47 +5,92 @@ melody.py
 
 ### Table of Contents
 
-1\.  [Video Demonstration](#videodemonstration)  
-2\.  [Installation](#installation)  
-2.1\.  [Ubuntu / Debian](#ubuntu/debian)  
-2.2\.  [Other](#other)  
-3\.  [Heuristics Used](#heuristicsused)  
-3.1\.  [For each individual melody](#foreachindividualmelody)  
-3.2\.  [To match cantus firmus melody to first species melody](#tomatchcantusfirmusmelodytofirstspeciesmelody)  
-4\.  [Wish List](#wishlist)  
+1\.  [Try It Now!](#tryitnow!)  
+2\.  [Video Demonstration](#videodemonstration)  
+3\.  [Usage](#usage)  
+3.1\.  [Installation](#installation)  
+3.1.1\.  [Ubuntu / Debian](#ubuntu/debian)  
+3.1.2\.  [Other](#other)  
+3.2\.  [Running melody.py](#runningmelody.py)  
+3.2.1\.  [Command-line interface](#command-lineinterface)  
+3.2.2\.  [Web interface](#webinterface)  
+4\.  [Heuristics Used](#heuristicsused)  
+4.1\.  [For each individual melody](#foreachindividualmelody)  
+4.2\.  [To match cantus firmus melody to first species melody](#tomatchcantusfirmusmelodytofirstspeciesmelody)  
+5\.  [Wish List](#wishlist)  
+
+<a name="tryitnow!"></a>
+
+### 1\. Try It Now!
+
+I've spun up an [Amazon EC2 instance](http://ec2-54-184-67-209.us-west-2.compute.amazonaws.com/).
 
 <a name="videodemonstration"></a>
 
-### 1\. Video Demonstration
+### 2\. Video Demonstration
 
 [![Link to Youtube video](images/youtube/8cF6pfrD4RM.png)](http://www.youtube.com/watch?v=8cF6pfrD4RM)
 
+<a name="usage"></a>
+
+### 3\. Usage
+
+You can use melody.py through the command-line or by running a small web server. The advantage of the latter is that you'll also be able to see generated sheet music.
+
 <a name="installation"></a>
 
-### 2\. Installation
+#### 3.1\. Installation
 
 <a name="ubuntu/debian"></a>
 
-#### 2.1\. Ubuntu / Debian
+##### 3.1.1\. Ubuntu / Debian
 
 ```
 sudo apt-get install python-pip timidity
 pip install pyknon
 ```
 
+If you wish to use the web interface, also run
+```
+pip install flask
+```
+
 <a name="other"></a>
 
-#### 2.2\. Other
+##### 3.1.2\. Other
 
 Install [Pyknon](http://kroger.github.com/pyknon/) and [Timidity](http://timidity.sourceforge.net/).
 
+If you wish to use the web interface, also install [Flask](http://flask.pocoo.org/). If you're using Internet Explorer (which supports MP3 but not WAV audio sources), make sure [FFmpeg](http://www.ffmpeg.org/) is installed.
+
+<a name="runningmelody.py"></a>
+
+#### 3.2\. Running melody.py
+
+<a name="command-lineinterface"></a>
+
+##### 3.2.1\. Command-line interface
+```
+python melody.py
+```
+will loop forever, generating new melodies continuously. Mash Ctrl-C a few times to stop it.
+
+<a name="webinterface"></a>
+
+##### 3.2.2\. Web interface
+```
+python app.py
+```
+
+Then go to `localhost:5000` (or whatever port is chosen).
+
 <a name="heuristicsused"></a>
 
-### 3\. Heuristics Used
+### 4\. Heuristics Used
 
 <a name="foreachindividualmelody"></a>
 
-#### 3.1\. For each individual melody
+#### 4.1\. For each individual melody
 
 Both the cantus firmus and the first species must satisfy the following rules:
 
@@ -68,7 +113,7 @@ Both the cantus firmus and the first species must satisfy the following rules:
 
 <a name="tomatchcantusfirmusmelodytofirstspeciesmelody"></a>
 
-#### 3.2\. To match cantus firmus melody to first species melody
+#### 4.2\. To match cantus firmus melody to first species melody
 
 Together, the cantus firmus and the first species must satisfy the following:
 
@@ -79,9 +124,10 @@ Together, the cantus firmus and the first species must satisfy the following:
 
 <a name="wishlist"></a>
 
-### 4\. Wish List
+### 5\. Wish List
 
+- minor key support
 - support for other kinds of counterpoint
 - support for melodies of other lengths (with rules tuned appropriately)
-- web interface of some kind
-- treating repeated notes as a single note of double duration rather than two separate notes
+- ability to import existing cantus firmus (as MIDI or note array)
+- minor: treating repeated notes as a single note of double duration rather than two separate notes
