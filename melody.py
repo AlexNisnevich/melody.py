@@ -44,9 +44,14 @@ m7 = Bb = vii               = 10
 M7 = Bb = VII = LeadingTone = 11
 P8      = O   = Octave      = 12
 
+def save_midi(midi):
+	midi.write("static/output.mid")
+	os.system("rm static/output.mp3")
+	os.system("timidity static/output.mid -Ow -o - | ffmpeg -i - -acodec libmp3lame -ab 64k static/output.mp3 >/dev/null 2>&1")
+
 def play_midi(midi):
-	midi.write("output.mid")
-	os.system("timidity output.mid >/dev/null")
+	save_midi(midi)
+	os.system("timidity static/output.mid >/dev/null")
 
 def get_runs_from_melody(melody):
 	# e.g.
@@ -277,7 +282,7 @@ def random_transpose(melodies):
 	key = choice([C, D, Eb, F, G, A-O, Bb-O])
 	return [[x + key for x in melody] for melody in melodies]
 
-def display_melody(melodies, raw_melodies, tonality, time_elapsed, tries):
+def display_melody(melodies, raw_melodies, tonality, time_elapsed, tries, cantus, first_species):
 	def pack_melody(melody, key):
 		return str(sum([(x + 12) * pow(24, i) for i, x in enumerate(melody + [key])]))
 
@@ -313,7 +318,7 @@ random_seed = random()
 print 'Seed: %.16f' % random_seed
 seed(random_seed)
 
-while True:
+def generate_melody(play = True):
 	melodies = []
 	try_again = False
 
@@ -357,7 +362,7 @@ while True:
 		print 'No matching first species found for this cantus firmus: ' + str(cantus)
 		print str(clock() - start_time) + ' secs taken (' + ' + '.join(["{:,d}".format(m) for m in tries]) + ' melodies tried)'
 		print
-		continue
+		return False, None
 	melodies.append(first_species)
 
 	# finish timing
@@ -367,6 +372,25 @@ while True:
 	transposed_melodies = random_transpose(melodies)
 
 	# display notes and generate midi
-	display_melody(transposed_melodies, melodies, tonality, time_elapsed, tries)
+	display_melody(transposed_melodies, melodies, tonality, time_elapsed, tries, cantus, first_species)
 	midi = midi_from_melodies(transposed_melodies)
-	play_midi(midi)
+	if play:
+		play_midi(midi)
+	else:
+		save_midi(midi)
+
+	pitches = []
+	for i in range(len(transposed_melodies)):
+		pitches.append([KEY_NAMES[x%Octave].lower() + "/" + str(4 + x//Octave) for x in transposed_melodies[i]])
+	lower_voice = list(pitches[0])
+	upper_voice = list(pitches[1])
+
+	key = KEY_NAMES[transposed_melodies[0][0] % Octave]
+	key_signature = key if tonality == 'major' else key + "m"
+
+	return True, (lower_voice, upper_voice, key_signature, time_elapsed, tries)
+
+if __name__ == "__main__":
+	while True:
+		generate_melody()
+

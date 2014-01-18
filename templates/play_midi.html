@@ -1,0 +1,62 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+		<script src="{{ url_for('static', filename='js/vexflow-min.js') }}"></script>
+		<script>
+			$(document).ready(function () {
+				var canvas = $("canvas")[0];
+				var renderer = new Vex.Flow.Renderer(canvas, Vex.Flow.Renderer.Backends.CANVAS);
+
+				var upperVoice = eval("{{ upperVoice|safe }}");
+				var upperNotes = upperVoice.map(function (key) {
+					return new Vex.Flow.StaveNote({ keys: [key], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP })
+				});
+
+				var lowerVoice = eval("{{ lowerVoice|safe }}");
+				var lowerNotes = lowerVoice.map(function (key) {
+					return new Vex.Flow.StaveNote({ keys: [key], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN })
+				});
+
+				var ctx = renderer.getContext();
+				var stave = new Vex.Flow.Stave(10, 0, 550);
+				
+				// Add a treble clef
+				stave.addClef("treble");
+				stave.addKeySignature("{{ keySignature }}");
+				stave.setContext(ctx).draw();
+
+				// Create a voice in 10/4
+				function create_10_4_voice() {
+					return new Vex.Flow.Voice({
+						num_beats: 10,
+						beat_value: 4,
+						resolution: Vex.Flow.RESOLUTION
+					});
+				}
+
+				// Create voices and add notes to each of them.
+				var voice = create_10_4_voice().addTickables(upperNotes);
+				var voice2 = create_10_4_voice().addTickables(lowerNotes);
+
+				// Format and justify the notes to 500 pixels
+				var formatter = new Vex.Flow.Formatter().
+				joinVoices([voice, voice2]).format([voice, voice2], 500);
+
+				// Render voice
+				voice.draw(ctx, stave);
+				voice2.draw(ctx, stave);
+			});
+		</script>
+	</head>
+	<body>
+		<p>Generated in {{ timeElapsed }} sec. <button onclick="location.reload(true)">Try Again!</button></p>
+		<div>
+			<audio autoplay controls>
+				<source src="./static/output.mp3?{{ rand }}" type="audio/mpeg">
+				Your browser does not support the audio element.
+			</audio>
+		</div>
+		<canvas width="800" height="300"></canvas>
+	</body>
+</html>
