@@ -19,8 +19,8 @@ def hello():
 		if results:
 			filename, lower_voice, upper_voice, key_signature, time_elapsed, tries = results
 			total_time_elapsed += time_elapsed
-	print lower_voice
-	print upper_voice
+	# print lower_voice
+	# print upper_voice
 	return render_template('play_midi.html', 
 		filename=filename,
 		lowerVoice=lower_voice, 

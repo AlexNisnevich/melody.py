@@ -30,6 +30,7 @@ def remove_dupes(seq):
 # Constants for convenience
 
 KEY_NAMES = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B']
+KEY_NAMES_SHARP = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 
 P1 = C  = I   = Tonic = Unison = 0
 m2 = Db = ii                = 1
@@ -294,7 +295,7 @@ def pick_melody(length, start_note = I, cantus = None): # pass cantus if this is
 
 def random_transpose(melodies):
 	key = choice([C, D, Eb, F, G, A-O, Bb-O])
-	return [[x + key for x in melody] for melody in melodies]
+	return [[x + key for x in melody] for melody in melodies], key % Octave
 
 def display_melody(melodies, raw_melodies, tonality, time_elapsed, tries, cantus, first_species):
 	def pack_melody(melody, key):
@@ -384,7 +385,7 @@ def generate_melody(server = False):
 	time_elapsed = clock() - start_time
 
 	# transpose to random valid key
-	transposed_melodies = random_transpose(melodies)
+	transposed_melodies, key = random_transpose(melodies)
 
 	# display notes and generate midi
 	midi = midi_from_melodies(transposed_melodies)
@@ -392,14 +393,20 @@ def generate_melody(server = False):
 
 	if server:
 		# return pitches and key signature, to create sheet music
+
+		# get proper enharmonics based on key signature
+		if 'b' in KEY_NAMES[key] or key == F:
+			note_names = KEY_NAMES
+		else:
+			note_names = KEY_NAMES_SHARP
+
 		pitches = []
 		for i in range(len(transposed_melodies)):
-			pitches.append([KEY_NAMES[x%Octave].lower() + "/" + str(4 + x//Octave) for x in transposed_melodies[i]])
+			pitches.append([note_names[x%Octave].lower() + "/" + str(4 + x//Octave) for x in transposed_melodies[i]])
 		lower_voice = list(pitches[0])
 		upper_voice = list(pitches[1])
 
-		key = KEY_NAMES[transposed_melodies[0][0] % Octave]
-		key_signature = key if tonality == 'major' else key + "m"
+		key_signature = KEY_NAMES[key] if tonality == 'major' else KEY_NAMES[key] + "m"
 
 		return True, (filename, lower_voice, upper_voice, key_signature, time_elapsed, tries)
 	else:
