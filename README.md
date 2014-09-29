@@ -23,7 +23,7 @@ melody.py
 
 ### 1\. Try It Now!
 
-I've spun up an [Amazon EC2 instance](http://ec2-54-184-67-209.us-west-2.compute.amazonaws.com/).
+I've spun up an [Amazon EC2 instance](http://melodypy.com/).
 
 <a name="videodemonstration"></a>
 
