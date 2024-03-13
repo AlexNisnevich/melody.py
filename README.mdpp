@@ -9,7 +9,7 @@ melody.py
 
 ### Try It Now!
 
-I've spun up an [Amazon EC2 instance](http://melodypy.com/).
+I've spun up an instance on [melodypy.com](http://melodypy.com/).
 
 ### Video Demonstration
 
@@ -24,13 +24,13 @@ You can use melody.py through the command-line or by running a small web server.
 ##### Ubuntu / Debian
 
 ```
-sudo apt-get install python-pip timidity
-pip install pyknon
+sudo apt-get install python-pip3 timidity
+pip3 install git+https://github.com/kroger/pyknon.git
 ```
 
 If you wish to use the web interface, also run
 ```
-pip install flask
+pip3 install flask
 ```
 
 ##### Other

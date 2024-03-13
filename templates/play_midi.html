@@ -20,7 +20,7 @@
 
 				var ctx = renderer.getContext();
 				var stave = new Vex.Flow.Stave(10, 0, 550);
-				
+
 				// Add a treble clef
 				stave.addClef("treble");
 				stave.addKeySignature("{{ keySignature }}");
@@ -54,7 +54,7 @@
 		<div>
 			<audio autoplay controls>
 				<source src="./static/output/{{ filename }}.wav" type="audio/mpeg">
-				<source src="./static/output/{{ filename }}.mp3" type="audio/mpeg">
+				<!--<source src="./static/output/{{ filename }}.mp3" type="audio/mpeg">-->
 				Your browser does not support the audio element.
 			</audio>
 		</div>

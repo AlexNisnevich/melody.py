@@ -5,19 +5,19 @@ melody.py
 
 ### Table of Contents
 
-1\.  [Try It Now!](#tryitnow!)  
-2\.  [Video Demonstration](#videodemonstration)  
-3\.  [Usage](#usage)  
-3.1\.  [Installation](#installation)  
-3.1.1\.  [Ubuntu / Debian](#ubuntu/debian)  
-3.1.2\.  [Other](#other)  
-3.2\.  [Running melody.py](#runningmelody.py)  
-3.2.1\.  [Command-line interface](#command-lineinterface)  
-3.2.2\.  [Web interface](#webinterface)  
-4\.  [Heuristics Used](#heuristicsused)  
-4.1\.  [For each individual melody](#foreachindividualmelody)  
-4.2\.  [To match cantus firmus melody to first species melody](#tomatchcantusfirmusmelodytofirstspeciesmelody)  
-5\.  [Wish List](#wishlist)  
+1\.  [Try It Now!](#tryitnow!)
+2\.  [Video Demonstration](#videodemonstration)
+3\.  [Usage](#usage)
+3.1\.  [Installation](#installation)
+3.1.1\.  [Ubuntu / Debian](#ubuntu/debian)
+3.1.2\.  [Other](#other)
+3.2\.  [Running melody.py](#runningmelody.py)
+3.2.1\.  [Command-line interface](#command-lineinterface)
+3.2.2\.  [Web interface](#webinterface)
+4\.  [Heuristics Used](#heuristicsused)
+4.1\.  [For each individual melody](#foreachindividualmelody)
+4.2\.  [To match cantus firmus melody to first species melody](#tomatchcantusfirmusmelodytofirstspeciesmelody)
+5\.  [Wish List](#wishlist)
 
 <a name="tryitnow!"></a>
 
@@ -46,13 +46,13 @@ You can use melody.py through the command-line or by running a small web server.
 ##### 3.1.1\. Ubuntu / Debian
 
 ```
-sudo apt-get install python-pip timidity
-pip install pyknon
+sudo apt-get install python-pip3 timidity
+pip3 install git+https://github.com/kroger/pyknon.git
 ```
 
 If you wish to use the web interface, also run
 ```
-pip install flask
+pip3 install flask
 ```
 
 <a name="other"></a>
