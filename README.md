@@ -46,7 +46,7 @@ You can use melody.py through the command-line or by running a small web server.
 ##### 3.1.1\. Ubuntu / Debian
 
 ```
-sudo apt-get install python-pip3 timidity
+sudo apt-get install python3-pip timidity
 pip3 install git+https://github.com/kroger/pyknon.git
 ```
 
