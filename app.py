@@ -1,6 +1,5 @@
-from flask import Flask, render_template
+from flask import Flask, Response, render_template
 from melody import *
-import random
 
 class MyFlask(Flask):
     def get_send_file_max_age(self, name):
@@ -31,7 +30,9 @@ def hello():
 
 @melodypy.route("/healthcheck")
 def healthcheck():
-    return "OK", 200
+    resp = Response("OK")
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    return resp
 
 if __name__ == "__main__":
 	melodypy.debug = True
