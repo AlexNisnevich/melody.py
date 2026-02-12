@@ -29,6 +29,10 @@ def hello():
 		timeElapsed=total_time_elapsed
 	)
 
+@melodypy.route("/healthcheck")
+def healthcheck():
+    return "OK", 200
+
 if __name__ == "__main__":
 	melodypy.debug = True
 	melodypy.run()
